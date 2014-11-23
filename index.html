@@ -8,33 +8,76 @@
         <link rel="stylesheet" href="css/main.css">
     </head>
     <body>
-
-        <main class="container">
-            <section>
+        <main class="container" ng-app="CommentApp" ng-controller="AjaxController">
+            <section id="item">
                 <img src="img/super-bass-o-matic-76.jpg" alt="product picture" class="product-picture">
                 <h1>The Super Bass-o-Matic '76</h1>
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia cumque deserunt ullam repudiandae nisi corporis! Ipsum, ducimus commodi, itaque porro distinctio consequuntur! Autem doloremque numquam nemo ex nulla tempora quis! Lorem ipsum dolor sit amet, consectetur adipisicing elit. Unde nihil doloribus excepturi quisquam error possimus veritatis facere, commodi cumque ab atque dolore ducimus obcaecati ipsa, impedit! Consequuntur, eligendi iure cumque!</p>
             </section>
 
-            <section>
+            <section id="add-comments" class="well">
                 <h2>Add a Comment</h2>
-                <!--  
-                put a form here for entering a new comment
-                the user must select a rating, and enter a name, title, and comment body
-                before the comment can be saved to the server
-                for the rating selection, use the Angular Bootstrap Rating directive 
-                http://angular-ui.github.io/bootstrap/#/rating
-                their script file is included below
-                -->
+                <form name="form" class="form-horizontal" role="form" novalidate>
+
+                    <div class="form-group">
+                        <label for="rating" class="control-label">Rating</label>
+                        <div class>
+                            <rating max="5" ng-model="newComment.rating" required></rating>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                      <input type="text" id="name" class="form-control" ng-model="newComment.name" placeholder="Your Name" required/>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                         <input type="text" id="comment-title" class="form-control"
+                                ng-model="newComment.title" placeholder="Title of Comment" required/>
+                    </div>
+
+                    <div class="form-group">
+                        <textarea class="form-control" ng-model="newComment.comment" placeholder="Comment" required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class>
+                            <button type="submit" id="submit" class="btn btn-default" ng-click="addComment()" ng-disabled="form.$invalid">Submit</button>
+                        </div>
+                    </div>
+                </form>
             </section>
 
             <section>
-                <h2>Comments</h2>
-                <!-- 
-                display existing comments here
-                each comment should also have UI allowing the user to vote up/down the comment
-                as well as delete it
-                 -->
+                <h2>Comments <img ng-show="loading" id="ajax-loader" src="img/ajax-spinner-sm.gif" alt="loading comments"/></h2>
+                <p ng-show="comments.length == 0">No comments yet. Be the first to review this!</p>
+                <table class="table table-striped" ng-show="comments.length > 0">
+                    <thead>
+                        <tr>
+                            <th id="comment-title">Title</th>
+                            <th id="user-name">Name</th>
+                            <th id="comment">Comment</th>
+                            <th id="rating">Rating</th>
+                            <th id="score">Score</th>
+                            <th id="delete">X?</th>
+                        </tr>
+                    </thead>
+                    <tr ng-repeat="comment in comments | orderBy : sortCol : !sortReverse">
+                        <td>{{comment.title}}</td>
+                        <td>{{comment.name}}</td>
+                        <td>{{comment.comment}}</td>
+                        <td><rating max="5" ng-model="comment.rating" ng-change="updateComment(comment)" readOnly="comment.score != null"></rating></td>
+                        <td>
+                            {{comment.score || 0}}
+                            <span class="glyphicon glyphicon-thumbs-up" ng-click="changeScore(comment, 1)"><a href=""></a></span>
+                            <span class="glyphicon glyphicon-thumbs-down" ng-click="changeScore(comment, -1)"><a href=""></a></span>
+                        </td>
+                        <td>
+                            <span class="glyphicon glyphicon-remove-circle" ng-click="deleteComment(comment)"></span>
+                        </td>
+                    </tr>
+                </table>
             </section>
 
         </main>
